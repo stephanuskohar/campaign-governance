@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Campaign Governance — Submit & Eligibility</title>
+    <title>Submit Campaign — Campaign Governance</title>
 
     <!-- Set theme before paint to avoid a flash of the wrong theme. -->
     <script>
@@ -18,9 +18,6 @@
       href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Roboto:wght@400;500;700&display=swap"
     />
     <link rel="stylesheet" href="css/styles.css" />
-
-    <!-- Google Identity Services (used only when AUTH_MODE = "google"). -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -29,52 +26,102 @@
           <span class="logo">S</span> Campaign Governance
         </a>
         <nav class="nav">
-          <a href="index.html" class="active">Submit & Eligibility</a>
-          <a href="calendar.html">Booking Calendar</a>
+          <a href="index.html" class="active">Submit Campaign</a>
         </nav>
         <div class="header-right">
-          <span class="user-chip" id="user-chip"></span>
-          <span id="signin-slot"></span>
-          <button class="link-btn" id="signout-btn" style="display: none">Sign out</button>
           <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">🌙</button>
         </div>
       </div>
     </header>
 
     <main>
-      <section class="hero">
-        <h1>Submit your campaign, discover eligible assets</h1>
-        <p>
-          Enter your campaign details once. The system records them in Google Sheets and reads
-          back the assets you qualify for — using the eligibility logic maintained centrally in
-          the sheet. Then head to the calendar to book available slots.
-        </p>
-      </section>
-
-      <section class="card">
-        <h2>Campaign details</h2>
-        <p class="sub">Fields marked <span style="color: var(--shopee-red)">*</span> are required.</p>
-        <form id="campaign-form">
-          <div class="form-grid" id="form-fields"><!-- fields injected from config --></div>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary" id="submit-btn">
-              Check eligibility
-            </button>
+      <div class="split">
+        <!-- LEFT: results -->
+        <section class="card result-panel" id="result-panel">
+          <div class="result-empty" id="result-empty">
+            <div class="result-empty-icon">📋</div>
+            <h2>Your results appear here</h2>
+            <p>Fill in the form and submit to record your campaign and see its details.</p>
           </div>
-          <div class="msg" id="form-msg"></div>
-        </form>
-      </section>
+          <div id="result-content" style="display: none"></div>
+        </section>
 
-      <section class="card" id="results-card" style="display: none">
-        <h2>Eligible assets</h2>
-        <p class="sub" id="results-sub"></p>
-        <div class="assets-grid" id="assets-grid"></div>
-      </section>
+        <!-- RIGHT: form -->
+        <section class="card">
+          <h2>Submit a campaign</h2>
+          <p class="sub">All fields are required. A unique ID and submission time are added automatically.</p>
+
+          <form id="campaign-form" novalidate>
+            <div class="form-grid">
+              <div class="field full">
+                <label for="f-user">User (your email) <span class="req">*</span></label>
+                <input id="f-user" type="email" placeholder="name@shopee.com" required />
+              </div>
+
+              <div class="field">
+                <label for="f-intent">Campaign Intent <span class="req">*</span></label>
+                <select id="f-intent" required></select>
+              </div>
+              <div class="field">
+                <label for="f-type">Campaign Type <span class="req">*</span></label>
+                <select id="f-type" required></select>
+              </div>
+
+              <div class="field full">
+                <label for="f-name">Campaign Name <span class="req">*</span></label>
+                <input id="f-name" type="text" required />
+              </div>
+
+              <div class="field">
+                <label for="f-start">Campaign Start Date <span class="req">*</span></label>
+                <input id="f-start" type="date" required />
+              </div>
+              <div class="field">
+                <label for="f-end">Campaign End Date <span class="req">*</span></label>
+                <input id="f-end" type="date" required />
+              </div>
+
+              <div class="field">
+                <label for="f-gmv">GMV ($) <span class="req">*</span></label>
+                <input id="f-gmv" type="number" min="0" step="any" required />
+              </div>
+              <div class="field">
+                <label for="f-a1">A1 <span class="req">*</span></label>
+                <input id="f-a1" type="number" min="0" step="any" required />
+              </div>
+
+              <div class="field full">
+                <label for="f-budget">Budget ($) <span class="req">*</span></label>
+                <input id="f-budget" type="number" min="0" step="any" required />
+              </div>
+
+              <div class="field full section-label">Seller Investment ($)</div>
+              <div class="field">
+                <label for="f-cash">Cash <span class="req">*</span></label>
+                <input id="f-cash" type="number" min="0" step="any" required />
+              </div>
+              <div class="field">
+                <label for="f-prm">Promissed PRM <span class="req">*</span></label>
+                <input id="f-prm" type="number" min="0" step="any" required />
+              </div>
+              <div class="field full">
+                <label for="f-barter">Marketing Barter <span class="req">*</span></label>
+                <input id="f-barter" type="number" min="0" step="any" required />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="submit-btn">Submit campaign</button>
+              <button type="reset" class="btn btn-secondary" id="reset-btn">Clear</button>
+            </div>
+            <div class="msg" id="form-msg"></div>
+          </form>
+        </section>
+      </div>
     </main>
 
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/common.js"></script>
     <script src="js/submit.js"></script>
