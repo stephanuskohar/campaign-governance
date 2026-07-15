@@ -1,0 +1,473 @@
+/* =========================================================================
+   Campaign Governance — styles
+   Shopee brand palette, themed for light & dark via CSS custom properties.
+   ========================================================================= */
+
+:root {
+  /* Shopee brand (fixed) */
+  --shopee-orange: #ee4d2d;
+  --shopee-orange-dark: #d3422a;
+  --shopee-orange-light: #f27961;
+  --shopee-red: #d0011b;
+  --shopee-navy: #113366;
+  --shopee-cyan: #26aa99;
+  --shopee-yellow: #ffbb00;
+
+  /* Fonts */
+  --font-primary: "Nunito", "ShopeeFont", system-ui, sans-serif;
+  --font-body: "Roboto", system-ui, sans-serif;
+
+  /* Status colours */
+  --status-pending: #ffbb00;
+  --status-confirmed: #26aa99;
+  --status-cancelled: #b3b9c2;
+
+  /* Layout */
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --maxw: 1080px;
+}
+
+/* Light theme (default) */
+:root,
+:root[data-theme="light"] {
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-2: #fafafa;
+  --text: #1a1a1a;
+  --text-muted: #616161;
+  --border: #e3e5e8;
+  --accent: var(--shopee-orange);
+  --accent-contrast: #ffffff;
+  --header-bg: var(--shopee-orange);
+  --header-text: #ffffff;
+}
+
+/* Dark theme */
+:root[data-theme="dark"] {
+  --bg: #14171c;
+  --surface: #1e2229;
+  --surface-2: #262b33;
+  --text: #f1f3f5;
+  --text-muted: #9aa4b2;
+  --border: #333a44;
+  --accent: var(--shopee-orange-light);
+  --accent-contrast: #14171c;
+  --header-bg: #1a1d23;
+  --header-text: #ffffff;
+  --shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.brand {
+  font-family: var(--font-primary);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+a {
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------------- Header */
+.site-header {
+  background: var(--header-bg);
+  color: var(--header-text);
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.site-header .inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.brand {
+  font-size: 20px;
+  color: var(--header-text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.brand .logo {
+  background: #fff;
+  color: var(--shopee-orange);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-family: var(--font-primary);
+}
+.nav {
+  display: flex;
+  gap: 6px;
+  margin-left: 8px;
+}
+.nav a {
+  color: var(--header-text);
+  text-decoration: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+.nav a:hover,
+.nav a.active {
+  background: rgba(255, 255, 255, 0.18);
+  opacity: 1;
+}
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-chip {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.95;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.icon-btn {
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  color: var(--header-text);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+}
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+.link-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: var(--header-text);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+.link-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ---------------------------------------------------------------- Layout */
+main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+}
+.hero {
+  background: linear-gradient(135deg, var(--shopee-orange) 0%, #f7a543 100%);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 34px 30px;
+  margin-bottom: 26px;
+}
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  color: #fff;
+}
+.hero p {
+  margin: 0;
+  font-size: 16px;
+  max-width: 640px;
+  opacity: 0.95;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 22px;
+}
+.card h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  color: var(--accent);
+}
+.card .sub {
+  margin: 0 0 18px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------------- Form */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field.full {
+  grid-column: 1 / -1;
+}
+label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+label .req {
+  color: var(--shopee-red);
+}
+input,
+select,
+textarea {
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.18);
+}
+
+/* ---------------------------------------------------------------- Buttons */
+.btn {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 26px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background: var(--shopee-orange);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--shopee-orange-dark);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+.btn-secondary:hover {
+  background: rgba(238, 77, 45, 0.1);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ---------------------------------------------------------------- Eligibility */
+.assets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.asset-card {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--status-confirmed);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.asset-card .name {
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 16px;
+}
+.asset-card .tag {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--status-confirmed);
+  background: rgba(38, 170, 153, 0.14);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+/* ---------------------------------------------------------------- Badges / status */
+.legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.legend .dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+.dot-pending {
+  background: var(--status-pending);
+}
+.dot-confirmed {
+  background: var(--status-confirmed);
+}
+.dot-cancelled {
+  background: var(--status-cancelled);
+}
+
+/* ---------------------------------------------------------------- Calendar */
+#calendar {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: var(--surface);
+  --fc-neutral-bg-color: var(--surface-2);
+  --fc-today-bg-color: rgba(238, 77, 45, 0.08);
+  --fc-button-bg-color: var(--shopee-orange);
+  --fc-button-border-color: var(--shopee-orange);
+  --fc-button-hover-bg-color: var(--shopee-orange-dark);
+  --fc-button-hover-border-color: var(--shopee-orange-dark);
+  --fc-button-active-bg-color: var(--shopee-orange-dark);
+  color: var(--text);
+}
+.fc .fc-toolbar-title {
+  font-family: var(--font-primary);
+  font-size: 20px;
+}
+.fc a {
+  color: inherit;
+}
+
+/* ---------------------------------------------------------------- Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-backdrop.open {
+  display: flex;
+}
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+}
+.modal h3 {
+  margin: 0 0 4px;
+  color: var(--accent);
+}
+.modal .muted {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0 0 18px;
+}
+.modal .form-grid {
+  grid-template-columns: 1fr 1fr;
+}
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* ---------------------------------------------------------------- Toast / status msg */
+.msg {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 16px;
+  display: none;
+}
+.msg.show {
+  display: block;
+}
+.msg.success {
+  background: rgba(38, 170, 153, 0.15);
+  color: var(--status-confirmed);
+}
+.msg.error {
+  background: rgba(208, 1, 27, 0.12);
+  color: var(--shopee-red);
+}
+.msg.info {
+  background: rgba(255, 187, 0, 0.15);
+  color: #9a7400;
+}
+
+.empty {
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ---------------------------------------------------------------- Responsive */
+@media (max-width: 720px) {
+  .form-grid,
+  .modal .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .site-header .inner {
+    flex-wrap: wrap;
+  }
+  .nav {
+    order: 3;
+    width: 100%;
+  }
+}
