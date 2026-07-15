@@ -158,6 +158,19 @@ function getResultById(id) {
   return { found: false };
 }
 
+// Returns all recorded campaigns from Web Read columns A:J (READ ONLY).
+function getCampaigns() {
+  var sh = getSheet(CONFIG.READ_TAB);
+  var headers = sh.getRange(1, 1, 1, 10).getValues()[0].map(function (h) { return String(h).trim(); });
+  var last = sh.getLastRow();
+  if (last < 2) return { headers: headers, rows: [] };
+  var vals = sh.getRange(2, 1, last - 1, 10).getValues();
+  var rows = vals
+    .filter(function (r) { return String(r[0]).trim() !== ""; })
+    .map(function (r) { return r.map(function (c, i) { return formatCell(headers[i], c); }); });
+  return { headers: headers, rows: rows };
+}
+
 function buildResult(headers, row) {
   function at(header) {
     var i = headers.indexOf(header);
