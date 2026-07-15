@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <base target="_top" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Roboto:wght@400;500;700&display=swap"
+    />
+    <style>
+      :root {
+        --shopee-orange: #ee4d2d; --shopee-orange-dark: #d3422a; --shopee-orange-light: #f27961;
+        --shopee-red: #d0011b;
+        --font-primary: "Nunito", sans-serif; --font-body: "Roboto", sans-serif;
+        --radius: 10px; --shadow: 0 2px 12px rgba(0,0,0,.08); --maxw: 1080px;
+      }
+      :root, :root[data-theme="light"] {
+        --bg:#f5f5f5; --surface:#fff; --surface-2:#fafafa; --text:#1a1a1a; --text-muted:#616161;
+        --border:#e3e5e8; --accent:var(--shopee-orange); --header-bg:var(--shopee-orange); --header-text:#fff;
+      }
+      :root[data-theme="dark"] {
+        --bg:#14171c; --surface:#1e2229; --surface-2:#262b33; --text:#f1f3f5; --text-muted:#9aa4b2;
+        --border:#333a44; --accent:var(--shopee-orange-light); --header-bg:#1a1d23; --header-text:#fff;
+        --shadow:0 2px 14px rgba(0,0,0,.4);
+      }
+      * { box-sizing: border-box; }
+      body { margin:0; font-family:var(--font-body); background:var(--bg); color:var(--text); line-height:1.5; }
+      h1,h2,h3,.brand { font-family:var(--font-primary); font-weight:800; line-height:1.15; }
+      .site-header { background:var(--header-bg); color:var(--header-text); box-shadow:var(--shadow); position:sticky; top:0; z-index:50; }
+      .site-header .inner { max-width:var(--maxw); margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:18px; }
+      .brand { font-size:20px; color:var(--header-text); display:flex; align-items:center; gap:10px; text-decoration:none; }
+      .brand .logo { background:#fff; color:var(--shopee-orange); width:30px; height:30px; border-radius:8px; display:grid; place-items:center; font-weight:900; font-family:var(--font-primary); }
+      .nav { display:flex; gap:6px; margin-left:8px; }
+      .nav a { color:var(--header-text); text-decoration:none; padding:7px 14px; border-radius:8px; font-weight:600; background:rgba(255,255,255,.18); }
+      .header-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+      .icon-btn { background:rgba(255,255,255,.16); border:none; color:var(--header-text); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:17px; }
+      .icon-btn:hover { background:rgba(255,255,255,.28); }
+      main { max-width:var(--maxw); margin:0 auto; padding:28px 20px 60px; }
+      .split { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
+      .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px; }
+      .card h2 { margin:0 0 4px; font-size:20px; color:var(--accent); }
+      .card .sub { margin:0 0 18px; color:var(--text-muted); font-size:14px; }
+      .form-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+      .field { display:flex; flex-direction:column; gap:6px; }
+      .field.full { grid-column:1 / -1; }
+      label { font-weight:600; font-size:13px; color:var(--text-muted); }
+      label .req { color:var(--shopee-red); }
+      input { font-family:var(--font-body); font-size:15px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); color:var(--text); }
+      input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(238,77,45,.18); }
+      input[readonly] { opacity:.85; cursor:not-allowed; }
+      .section-label { grid-column:1 / -1; font-family:var(--font-primary); font-weight:700; color:var(--text-muted); border-bottom:1px solid var(--border); padding-bottom:4px; margin-top:4px; }
+      .btn { font-family:var(--font-body); font-weight:700; font-size:15px; padding:12px 26px; border-radius:8px; border:none; cursor:pointer; }
+      .btn-primary { background:var(--shopee-orange); color:#fff; }
+      .btn-primary:hover { background:var(--shopee-orange-dark); }
+      .btn-secondary { background:transparent; color:var(--accent); border:2px solid var(--accent); }
+      .btn:disabled { opacity:.6; cursor:not-allowed; }
+      .form-actions { margin-top:20px; display:flex; gap:12px; }
+      .msg { padding:12px 16px; border-radius:8px; font-weight:600; font-size:14px; margin-top:16px; display:none; }
+      .msg.show { display:block; }
+      .msg.success { background:rgba(38,170,153,.15); color:#26aa99; }
+      .msg.error { background:rgba(208,1,27,.12); color:var(--shopee-red); }
+      .msg.info { background:rgba(255,187,0,.15); color:#9a7400; }
+      .result-panel { position:sticky; top:88px; }
+      .result-empty { text-align:center; color:var(--text-muted); padding:40px 16px; }
+      .result-empty-icon { font-size:40px; margin-bottom:10px; }
+      .result-empty h2 { color:var(--text); margin:0 0 6px; font-size:18px; }
+      #result-content h2 { color:var(--accent); margin:0 0 14px; }
+      .result-row { display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid var(--border); font-size:14px; }
+      .result-row .rl { color:var(--text-muted); font-weight:600; }
+      .result-row .rv { color:var(--text); font-weight:700; text-align:right; word-break:break-word; }
+      .result-note { margin-top:16px; padding:12px 14px; background:rgba(255,187,0,.14); border-radius:8px; color:var(--text-muted); font-size:13px; }
+      .ms { position:relative; }
+      .ms-toggle { width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; font-family:var(--font-body); font-size:15px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); color:var(--text); cursor:pointer; text-align:left; }
+      .ms.open .ms-toggle, .ms-toggle:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(238,77,45,.18); }
+      .ms-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .ms-label.ms-placeholder { color:var(--text-muted); }
+      .ms-caret { color:var(--text-muted); font-size:12px; }
+      .ms.open .ms-caret { transform:rotate(180deg); }
+      .ms-panel { position:absolute; z-index:60; top:calc(100% + 4px); left:0; right:0; max-height:240px; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow); padding:6px; }
+      .ms-option { display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:14px; font-weight:500; }
+      .ms-option:hover { background:var(--surface-2); }
+      .ms-option input { width:16px; height:16px; accent-color:var(--shopee-orange); margin:0; }
+      .ms-empty { padding:10px; color:var(--text-muted); font-style:italic; font-size:14px; }
+      @media (max-width:860px){ .split{ grid-template-columns:1fr; } .result-panel{ position:static; } .form-grid{ grid-template-columns:1fr; } }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="inner">
+        <span class="brand"><span class="logo">S</span> Campaign Governance</span>
+        <nav class="nav"><a href="#">Submit Campaign</a></nav>
+        <div class="header-right">
+          <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme">🌙</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="split">
+        <section class="card result-panel">
+          <div class="result-empty" id="result-empty">
+            <div class="result-empty-icon">📋</div>
+            <h2>Your results appear here</h2>
+            <p>Fill in the form and submit to record your campaign.</p>
+          </div>
+          <div id="result-content" style="display:none"></div>
+        </section>
+
+        <section class="card">
+          <h2>Submit a campaign</h2>
+          <p class="sub">All fields are required. Your email, a unique ID, and the submission time are added automatically.</p>
+          <form id="campaign-form" novalidate>
+            <div class="form-grid">
+              <div class="field full">
+                <label for="f-user">User (your email)</label>
+                <input id="f-user" type="email" value="<?= userEmail ?>" readonly />
+              </div>
+              <div class="field">
+                <label>Campaign Intent <span class="req">*</span></label>
+                <div id="ms-intent"></div>
+              </div>
+              <div class="field">
+                <label>Campaign Type <span class="req">*</span></label>
+                <div id="ms-type"></div>
+              </div>
+              <div class="field full">
+                <label for="f-name">Campaign Name <span class="req">*</span></label>
+                <input id="f-name" type="text" required />
+              </div>
+              <div class="field">
+                <label for="f-start">Campaign Start Date <span class="req">*</span></label>
+                <input id="f-start" type="date" required />
+              </div>
+              <div class="field">
+                <label for="f-end">Campaign End Date <span class="req">*</span></label>
+                <input id="f-end" type="date" required />
+              </div>
+              <div class="field">
+                <label for="f-gmv">GMV ($) <span class="req">*</span></label>
+                <input id="f-gmv" type="number" min="0" step="any" required />
+              </div>
+              <div class="field">
+                <label for="f-a1">A1 <span class="req">*</span></label>
+                <input id="f-a1" type="number" min="0" step="any" required />
+              </div>
+              <div class="field full">
+                <label for="f-budget">Budget ($) <span class="req">*</span></label>
+                <input id="f-budget" type="number" min="0" step="any" required />
+              </div>
+              <div class="field full section-label">Seller Investment ($)</div>
+              <div class="field">
+                <label for="f-cash">Cash <span class="req">*</span></label>
+                <input id="f-cash" type="number" min="0" step="any" required />
+              </div>
+              <div class="field">
+                <label for="f-prm">Promissed PRM <span class="req">*</span></label>
+                <input id="f-prm" type="number" min="0" step="any" required />
+              </div>
+              <div class="field full">
+                <label for="f-barter">Marketing Barter <span class="req">*</span></label>
+                <input id="f-barter" type="number" min="0" step="any" required />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="submit-btn">Submit campaign</button>
+              <button type="reset" class="btn btn-secondary">Clear</button>
+            </div>
+            <div class="msg" id="form-msg"></div>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      // ---- Config ----
+      var ALLOWED_DOMAIN = "shopee.com", MIN_DAYS = 1, MAX_DAYS = 365;
+
+      // ---- Theme ----
+      (function () {
+        var saved = localStorage.getItem("cg_theme");
+        if (saved) document.documentElement.setAttribute("data-theme", saved);
+        function cur() { return document.documentElement.getAttribute("data-theme") || "light"; }
+        function upd() { document.getElementById("theme-toggle").textContent = cur() === "dark" ? "☀️" : "🌙"; }
+        document.getElementById("theme-toggle").addEventListener("click", function () {
+          var t = cur() === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-theme", t);
+          localStorage.setItem("cg_theme", t); upd();
+        });
+        upd();
+      })();
+
+      // ---- google.script.run as promises ----
+      function gs(method) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return new Promise(function (resolve, reject) {
+          google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[method].apply(null, args);
+        });
+      }
+
+      // ---- MultiSelect ----
+      var instances = [];
+      function closeAll() { instances.forEach(function (i) { i._close(); }); }
+      document.addEventListener("click", closeAll);
+      function createMS(container, placeholder) {
+        container.classList.add("ms");
+        container.innerHTML = '<button type="button" class="ms-toggle"><span class="ms-label"></span><span class="ms-caret">▾</span></button><div class="ms-panel" hidden></div>';
+        var toggle = container.querySelector(".ms-toggle"), label = container.querySelector(".ms-label"), panel = container.querySelector(".ms-panel");
+        function renderLabel() {
+          var v = getValues();
+          if (!v.length) { label.textContent = placeholder; label.classList.add("ms-placeholder"); }
+          else { label.classList.remove("ms-placeholder"); label.textContent = v.length <= 2 ? v.join(", ") : v.length + " selected"; }
+        }
+        function setOptions(list) {
+          panel.innerHTML = "";
+          if (!list || !list.length) { panel.innerHTML = '<div class="ms-empty">No options available.</div>'; }
+          else list.forEach(function (o) {
+            var row = document.createElement("label"); row.className = "ms-option";
+            var inp = document.createElement("input"); inp.type = "checkbox"; inp.value = o;
+            inp.addEventListener("change", renderLabel);
+            var sp = document.createElement("span"); sp.textContent = o;
+            row.appendChild(inp); row.appendChild(sp); panel.appendChild(row);
+          });
+          renderLabel();
+        }
+        function getValues() { return Array.prototype.slice.call(panel.querySelectorAll("input:checked")).map(function (c) { return c.value; }); }
+        function clear() { panel.querySelectorAll("input:checked").forEach(function (c) { c.checked = false; }); renderLabel(); }
+        toggle.addEventListener("click", function (e) { e.stopPropagation(); var h = panel.hidden; closeAll(); if (h) { panel.hidden = false; container.classList.add("open"); } });
+        panel.addEventListener("click", function (e) { e.stopPropagation(); });
+        var api = { setOptions: setOptions, getValues: getValues, clear: clear, _close: function () { panel.hidden = true; container.classList.remove("open"); } };
+        instances.push(api); renderLabel(); return api;
+      }
+
+      // ---- Page logic ----
+      var el = function (id) { return document.getElementById(id); };
+      var msg = el("form-msg"), form = el("campaign-form"), submitBtn = el("submit-btn");
+      var intentMS = createMS(el("ms-intent"), "Select intent(s)…");
+      var typeMS = createMS(el("ms-type"), "Select type(s)…");
+      function showMsg(k, t) { msg.className = "msg show " + k; msg.textContent = t; }
+      function hideMsg() { msg.className = "msg"; msg.textContent = ""; }
+
+      var jakartaToday = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+      el("f-start").max = jakartaToday;
+
+      gs("getOptions").then(function (o) {
+        intentMS.setOptions(o.intents || []); typeMS.setOptions(o.types || []);
+      }).catch(function (e) {
+        intentMS.setOptions([]); typeMS.setOptions([]);
+        showMsg("error", "Could not load Intent/Type options: " + (e.message || e));
+      });
+
+      function genId() {
+        var a = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", f = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
+        var id = f[Math.floor(Math.random() * f.length)];
+        for (var i = 1; i < 10; i++) id += a[Math.floor(Math.random() * a.length)];
+        return id;
+      }
+      function days(s, e) { return Math.round((new Date(e) - new Date(s)) / 86400000); }
+      function num(id) { return parseFloat(el(id).value); }
+
+      function validate(v) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.user)) return "Your account email is missing or invalid.";
+        if (v.user.toLowerCase().indexOf("@" + ALLOWED_DOMAIN) === -1) return "Email must be on the @" + ALLOWED_DOMAIN + " domain.";
+        if (!v.intents.length) return "Select at least one Campaign Intent.";
+        if (!v.types.length) return "Select at least one Campaign Type.";
+        if (!v.name) return "Enter a Campaign Name.";
+        if (!v.start) return "Choose a Campaign Start Date.";
+        if (!v.end) return "Choose a Campaign End Date.";
+        if (v.start > jakartaToday) return "Campaign Start Date must be on or before today (" + jakartaToday + ").";
+        var d = days(v.start, v.end);
+        if (d < MIN_DAYS) return "Campaign End Date must be at least " + MIN_DAYS + " day after the Start Date.";
+        if (d > MAX_DAYS) return "Campaign cannot be longer than " + MAX_DAYS + " days (currently " + d + ").";
+        var nums = { "GMV ($)": ["f-gmv", v.gmv], "A1": ["f-a1", v.a1], "Budget ($)": ["f-budget", v.budget], "Seller Investment - Cash": ["f-cash", v.cash], "Seller Investment - Promissed PRM": ["f-prm", v.prm], "Seller Investment - Marketing Barter": ["f-barter", v.barter] };
+        for (var k in nums) { if (el(nums[k][0]).value === "" || isNaN(nums[k][1])) return k + " must be a number."; if (nums[k][1] < 0) return k + " cannot be negative."; }
+        return null;
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault(); hideMsg();
+        var v = {
+          user: el("f-user").value.trim(), intents: intentMS.getValues(), types: typeMS.getValues(),
+          name: el("f-name").value.trim(), start: el("f-start").value, end: el("f-end").value,
+          gmv: num("f-gmv"), a1: num("f-a1"), budget: num("f-budget"), cash: num("f-cash"), prm: num("f-prm"), barter: num("f-barter")
+        };
+        var err = validate(v); if (err) { showMsg("error", err); return; }
+        var id = genId(), intentStr = v.intents.join(", "), typeStr = v.types.join(", ");
+        var fields = {
+          "User": v.user, "Campaign Intent": intentStr, "Campaign Type": typeStr, "Name": v.name,
+          "Campaign Start Date": v.start, "Campaign End Date": v.end,
+          "GMV ($)": v.gmv, "A1": v.a1, "Budget ($)": v.budget,
+          "Seller Investment ($) - Cash": v.cash, "Seller Investment ($) - Promissed PRM": v.prm,
+          "Seller Investment ($) - Marketing Barter": v.barter, "ID": id
+        };
+        submitBtn.disabled = true; submitBtn.textContent = "Submitting…";
+        gs("submitCampaign", fields).then(function (res) {
+          renderResult(v, intentStr, typeStr, res.id || id, res.date, days(v.start, v.end));
+          form.reset(); intentMS.clear(); typeMS.clear(); el("f-user").value = v.user;
+          showMsg("success", "Campaign submitted successfully (ID: " + (res.id || id) + ").");
+        }).catch(function (e2) {
+          showMsg("error", (e2 && e2.message) || String(e2));
+        }).then(function () {
+          submitBtn.disabled = false; submitBtn.textContent = "Submit campaign";
+        });
+      });
+
+      function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+      function rrow(l, val) { return '<div class="result-row"><span class="rl">' + esc(l) + '</span><span class="rv">' + esc(val) + "</span></div>"; }
+      function renderResult(v, intentStr, typeStr, id, date, d) {
+        el("result-empty").style.display = "none";
+        var rc = el("result-content"); rc.style.display = "block";
+        rc.innerHTML = "<h2>Your Campaign</h2>" +
+          rrow("ID", id) + rrow("User", v.user) + rrow("Date", date || "(recorded)") +
+          rrow("Campaign Intent", intentStr) + rrow("Campaign Type", typeStr) + rrow("Name", v.name) +
+          rrow("Campaign Start Date", v.start) + rrow("Campaign End Date", v.end) + rrow("# Days", String(d)) +
+          '<div class="result-note">Score, Tier, Duration Tier and asset eligibility (Basic &amp; Additional) will appear here once the results read-back is wired up.</div>';
+      }
+    </script>
+  </body>
+</html>

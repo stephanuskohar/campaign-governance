@@ -1,59 +1,54 @@
 /**
- * Campaign Governance — Google Apps Script backend (Web App).
+ * Campaign Governance — Apps Script web app (UI + backend in one).
  *
- * - getOptions  : returns Campaign Intent / Type options from "Director Note Ingestion".
- * - submitCampaign : appends a validated campaign to the "Web Ingestion" tab.
+ * Deployed as: Execute as "User accessing", Access "Anyone within Shopee".
+ * The UI is served by doGet() and calls the server via google.script.run — so it
+ * runs same-origin on script.google.com as the signed-in user (no CORS).
  *
- * SETUP
- *   1. Open the Sheet → Extensions → Apps Script. Paste this file in.
- *   2. Deploy → New deployment → Web app:
- *        - Execute as: Me
- *        - Who has access: Anyone
- *      Copy the /exec URL into js/config.js → WEB_APP_URL.
- *   3. (Optional) Run testGetOptions / testSubmit once to approve permissions.
+ * DEPLOY
+ *   1. In the Sheet → Extensions → Apps Script, create two files:
+ *        - Code.gs   (this file)
+ *        - Index.html (from apps-script/Index.html)
+ *   2. Deploy → New deployment → Web app (or Manage deployments → New version).
+ *   3. Open the /exec URL.
  *
- * Columns are matched BY HEADER NAME, header row is auto-detected, and only the
- * matched input columns are written — computed columns are never overwritten.
+ * NOTE: Because it executes as the accessing user, each submitter needs EDIT
+ * access to this spreadsheet (share it with the Shopee domain as Editor).
  */
 
 // ============================== CONFIG =======================================
 var CONFIG = {
   SPREADSHEET_ID: "15MG67LYIhV5HCH7EUNxZvF3rFmlkgWvCY9k_O1d_A-0",
 
-  // --- Append target ---
   INGEST_TAB: "Web Ingestion",
-  KEY_HEADER: "User", // used to locate the header row
+  KEY_HEADER: "User",
   DATE_HEADER: "Date",
   TIMEZONE: "Asia/Jakarta",
   DATE_FORMAT: "yyyy-MM-dd HH:mm:ss",
-  DATE_COLUMNS: ["Campaign Start Date", "Campaign End Date"], // stored as real Dates
+  DATE_COLUMNS: ["Campaign Start Date", "Campaign End Date"],
 
-  // --- Dropdown option source ---
   DIRECTOR_TAB: "Director Note Ingestion",
   INTENT_COL_INDEX: 2, // column B → Campaign Intent
   TYPE_COL_INDEX: 1, // column A → Campaign Type
+
+  ALLOWED_DOMAIN: "shopee.com",
 };
 // =============================================================================
 
-function doGet(e) {
-  try {
-    var action = (e && e.parameter && e.parameter.action) || "";
-    if (action === "getOptions") return json({ ok: true, data: getOptions() });
-    return json({ ok: true, data: { status: "Campaign Governance backend is running." } });
-  } catch (err) {
-    return json({ ok: false, error: err.message });
-  }
+function doGet() {
+  var t = HtmlService.createTemplateFromFile("Index");
+  t.userEmail = getActiveUserEmail();
+  return t
+    .evaluate()
+    .setTitle("Submit Campaign — Campaign Governance")
+    .addMetaTag("viewport", "width=device-width, initial-scale=1.0");
 }
 
-function doPost(e) {
+function getActiveUserEmail() {
   try {
-    var body = JSON.parse((e && e.postData && e.postData.contents) || "{}");
-    if (body.action === "submitCampaign") {
-      return json({ ok: true, data: submitCampaign(body.fields || {}) });
-    }
-    return json({ ok: false, error: "Unknown action: " + body.action });
-  } catch (err) {
-    return json({ ok: false, error: err.message });
+    return Session.getActiveUser().getEmail() || "";
+  } catch (e) {
+    return "";
   }
 }
 
@@ -72,14 +67,10 @@ function getOptions() {
 }
 
 function uniqueNonEmpty(arr) {
-  var seen = {};
-  var out = [];
+  var seen = {}, out = [];
   arr.forEach(function (v) {
     var s = String(v == null ? "" : v).trim();
-    if (s && !seen[s]) {
-      seen[s] = true;
-      out.push(s);
-    }
+    if (s && !seen[s]) { seen[s] = true; out.push(s); }
   });
   out.sort(function (a, b) { return a.localeCompare(b); });
   return out;
@@ -88,15 +79,20 @@ function uniqueNonEmpty(arr) {
 // ------------------------------- Submit ------------------------------------
 
 function submitCampaign(fields) {
+  fields = fields || {};
+
+  // Authoritative identity: the signed-in user.
+  var email = getActiveUserEmail();
+  if (email) fields.User = email;
+  if (CONFIG.ALLOWED_DOMAIN && String(fields.User || "").toLowerCase().indexOf("@" + CONFIG.ALLOWED_DOMAIN) === -1) {
+    throw new Error("Only @" + CONFIG.ALLOWED_DOMAIN + " accounts can submit.");
+  }
+
   var sh = getSheet(CONFIG.INGEST_TAB);
   var headers = findHeader(sh);
-
-  // Stamp submission time in Jakarta time.
   fields[CONFIG.DATE_HEADER] = Utilities.formatDate(new Date(), CONFIG.TIMEZONE, CONFIG.DATE_FORMAT);
 
-  // Map only matched input columns; never touch computed columns to the right.
-  var cells = {};
-  var maxCol = 0;
+  var cells = {}, maxCol = 0;
   headers.forEach(function (h, i) {
     h = String(h).trim();
     if (fields.hasOwnProperty(h)) {
@@ -113,7 +109,7 @@ function submitCampaign(fields) {
   Object.keys(cells).forEach(function (i) { row[Number(i)] = cells[i]; });
   sh.getRange(targetRow, 1, 1, maxCol).setValues([row]);
 
-  return { id: fields.ID || "", date: fields[CONFIG.DATE_HEADER], row: targetRow };
+  return { id: fields.ID || "", date: fields[CONFIG.DATE_HEADER], user: fields.User, row: targetRow };
 }
 
 // ------------------------------- Helpers -----------------------------------
@@ -127,7 +123,6 @@ function getSheet(name) {
   return sh;
 }
 
-/** Find and return the header row values by scanning first 15 rows for KEY_HEADER. */
 function findHeader(sh) {
   var scan = Math.min(15, sh.getLastRow() || 1);
   var block = sh.getRange(1, 1, scan, sh.getLastColumn()).getValues();
@@ -139,37 +134,11 @@ function findHeader(sh) {
   throw new Error('Header row not found (no "' + CONFIG.KEY_HEADER + '" cell in first ' + scan + " rows).");
 }
 
-/** Parse "YYYY-MM-DD" into a local-midnight Date (date-only, no TZ shift). */
 function parseDate(s) {
   var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s).trim());
   if (!m) return s;
   return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
 }
 
-function json(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
-    ContentService.MimeType.JSON
-  );
-}
-
 // ------------------------------- Self-tests --------------------------------
-function testGetOptions() {
-  Logger.log(JSON.stringify(getOptions(), null, 2));
-}
-
-function testSubmit() {
-  var out = submitCampaign({
-    "User": "test@shopee.com",
-    "Campaign Intent": "Conversion",
-    "Campaign Type": "Category",
-    "Name": "TEST — delete me",
-    "Campaign Start Date": "2026-07-01",
-    "Campaign End Date": "2026-07-10",
-    "GMV ($)": 1000, "A1": 0, "Budget ($)": 500,
-    "Seller Investment ($) - Cash": 0,
-    "Seller Investment ($) - Promissed PRM": 0,
-    "Seller Investment ($) - Marketing Barter": 0,
-    "ID": "TEST123456",
-  });
-  Logger.log(JSON.stringify(out));
-}
+function testGetOptions() { Logger.log(JSON.stringify(getOptions(), null, 2)); }
