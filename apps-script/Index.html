@@ -34,7 +34,9 @@
       .header-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
       .icon-btn { background:rgba(255,255,255,.16); border:none; color:var(--header-text); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:17px; }
       .icon-btn:hover { background:rgba(255,255,255,.28); }
-      main { max-width:var(--maxw); margin:0 auto; padding:28px 20px 60px; }
+      main { margin:0 auto; padding:28px 28px 60px; }
+      #view-submit { max-width:var(--maxw); margin:0 auto; }
+      #view-list { width:100%; }
       .split { display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
       .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px; }
       .card h2 { margin:0 0 4px; font-size:20px; color:var(--accent); }
@@ -108,10 +110,11 @@
       .list-count { color:var(--text-muted); font-size:13px; margin-bottom:10px; }
       .table-wrap { overflow:auto; max-height:65vh; border:1px solid var(--border); border-radius:8px; }
       table.cg { width:100%; border-collapse:collapse; font-size:13px; }
-      table.cg th, table.cg td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--border); white-space:nowrap; }
+      table.cg { table-layout:fixed; }
+      table.cg th, table.cg td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top; word-break:break-word; overflow-wrap:anywhere; }
       table.cg th.col-head { color:var(--text-muted); font-weight:700; position:sticky; top:0; z-index:2; background:var(--surface-2); }
       table.cg tr.filters th { position:sticky; top:37px; z-index:1; background:var(--surface); padding:6px 8px; }
-      table.cg .col-filter { width:100%; min-width:96px; padding:6px 8px; font-size:12px; }
+      table.cg .col-filter { width:100%; min-width:0; padding:6px 8px; font-size:12px; }
       table.cg tbody tr:hover { background:var(--surface-2); }
       table.cg tbody tr:last-child td { border-bottom:none; }
     </style>
