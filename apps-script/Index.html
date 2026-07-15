@@ -44,8 +44,8 @@
       .field.full { grid-column:1 / -1; }
       label { font-weight:600; font-size:13px; color:var(--text-muted); }
       label .req { color:var(--shopee-red); }
-      input { font-family:var(--font-body); font-size:15px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); color:var(--text); }
-      input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(238,77,45,.18); }
+      input, select { font-family:var(--font-body); font-size:15px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); color:var(--text); }
+      input:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(238,77,45,.18); }
       input[readonly] { opacity:.85; cursor:not-allowed; }
       .section-label { grid-column:1 / -1; font-family:var(--font-primary); font-weight:700; color:var(--text-muted); border-bottom:1px solid var(--border); padding-bottom:4px; margin-top:4px; }
       .btn { font-family:var(--font-body); font-weight:700; font-size:15px; padding:12px 26px; border-radius:8px; border:none; cursor:pointer; }
@@ -119,8 +119,8 @@
                 <div id="ms-intent"></div>
               </div>
               <div class="field">
-                <label>Campaign Type <span class="req">*</span></label>
-                <div id="ms-type"></div>
+                <label for="f-type">Campaign Type <span class="req">*</span></label>
+                <select id="f-type" required><option value="" disabled selected>— select —</option></select>
               </div>
               <div class="field full">
                 <label for="f-name">Campaign Name <span class="req">*</span></label>
@@ -233,7 +233,13 @@
       var el = function (id) { return document.getElementById(id); };
       var msg = el("form-msg"), form = el("campaign-form"), submitBtn = el("submit-btn");
       var intentMS = createMS(el("ms-intent"), "Select intent(s)…");
-      var typeMS = createMS(el("ms-type"), "Select type(s)…");
+      function fillTypeSelect(list) {
+        var sel = el("f-type");
+        sel.innerHTML = '<option value="" disabled selected>— select —</option>';
+        (list || []).forEach(function (o) {
+          var opt = document.createElement("option"); opt.value = o; opt.textContent = o; sel.appendChild(opt);
+        });
+      }
       function showMsg(k, t) { msg.className = "msg show " + k; msg.textContent = t; }
       function hideMsg() { msg.className = "msg"; msg.textContent = ""; }
 
@@ -241,9 +247,9 @@
       el("f-start").max = jakartaToday;
 
       gs("getOptions").then(function (o) {
-        intentMS.setOptions(o.intents || []); typeMS.setOptions(o.types || []);
+        intentMS.setOptions(o.intents || []); fillTypeSelect(o.types || []);
       }).catch(function (e) {
-        intentMS.setOptions([]); typeMS.setOptions([]);
+        intentMS.setOptions([]); fillTypeSelect([]);
         showMsg("error", "Could not load Intent/Type options: " + (e.message || e));
       });
 
@@ -260,7 +266,7 @@
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.user)) return "Your account email is missing or invalid.";
         if (v.user.toLowerCase().indexOf("@" + ALLOWED_DOMAIN) === -1) return "Email must be on the @" + ALLOWED_DOMAIN + " domain.";
         if (!v.intents.length) return "Select at least one Campaign Intent.";
-        if (!v.types.length) return "Select at least one Campaign Type.";
+        if (!v.type) return "Select a Campaign Type.";
         if (!v.name) return "Enter a Campaign Name.";
         if (!v.start) return "Choose a Campaign Start Date.";
         if (!v.end) return "Choose a Campaign End Date.";
@@ -276,12 +282,12 @@
       form.addEventListener("submit", function (e) {
         e.preventDefault(); hideMsg();
         var v = {
-          user: el("f-user").value.trim(), intents: intentMS.getValues(), types: typeMS.getValues(),
+          user: el("f-user").value.trim(), intents: intentMS.getValues(), type: el("f-type").value,
           name: el("f-name").value.trim(), start: el("f-start").value, end: el("f-end").value,
           gmv: num("f-gmv"), a1: num("f-a1"), budget: num("f-budget"), cash: num("f-cash"), prm: num("f-prm"), barter: num("f-barter")
         };
         var err = validate(v); if (err) { showMsg("error", err); return; }
-        var id = genId(), intentStr = v.intents.join(", "), typeStr = v.types.join(", ");
+        var id = genId(), intentStr = v.intents.join(", "), typeStr = v.type;
         var fields = {
           "User": v.user, "Campaign Intent": intentStr, "Campaign Type": typeStr, "Name": v.name,
           "Campaign Start Date": v.start, "Campaign End Date": v.end,
@@ -292,7 +298,7 @@
         submitBtn.disabled = true; submitBtn.textContent = "Submitting…";
         gs("submitCampaign", fields).then(function (res) {
           renderResult(v, intentStr, typeStr, res.id || id, res.date, days(v.start, v.end));
-          form.reset(); intentMS.clear(); typeMS.clear(); el("f-user").value = v.user;
+          form.reset(); intentMS.clear(); el("f-user").value = v.user;
           showMsg("success", "Campaign submitted successfully (ID: " + (res.id || id) + ").");
         }).catch(function (e2) {
           showMsg("error", (e2 && e2.message) || String(e2));
