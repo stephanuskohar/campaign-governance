@@ -106,10 +106,12 @@
       .filter-bar { display:flex; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
       .filter-bar input { flex:1; min-width:240px; }
       .list-count { color:var(--text-muted); font-size:13px; margin-bottom:10px; }
-      .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:8px; }
+      .table-wrap { overflow:auto; max-height:65vh; border:1px solid var(--border); border-radius:8px; }
       table.cg { width:100%; border-collapse:collapse; font-size:13px; }
       table.cg th, table.cg td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--border); white-space:nowrap; }
-      table.cg th { color:var(--text-muted); font-weight:700; position:sticky; top:0; background:var(--surface-2); }
+      table.cg th.col-head { color:var(--text-muted); font-weight:700; position:sticky; top:0; z-index:2; background:var(--surface-2); }
+      table.cg tr.filters th { position:sticky; top:37px; z-index:1; background:var(--surface); padding:6px 8px; }
+      table.cg .col-filter { width:100%; min-width:96px; padding:6px 8px; font-size:12px; }
       table.cg tbody tr:hover { background:var(--surface-2); }
       table.cg tbody tr:last-child td { border-bottom:none; }
     </style>
@@ -210,10 +212,10 @@
       <div id="view-list" style="display:none">
         <section class="card">
           <h2>Submitted campaigns</h2>
-          <p class="sub">All recorded campaigns (read from “Web Read”).</p>
+          <p class="sub">All recorded campaigns.</p>
           <div class="filter-bar">
-            <input id="list-filter" type="text" placeholder="Filter by ID, user, type, name, or start/end date…" />
             <button class="btn btn-secondary" id="list-refresh" type="button">Refresh</button>
+            <button class="btn btn-secondary" id="list-clear" type="button">Clear filters</button>
           </div>
           <div class="list-count" id="list-count"></div>
           <div class="table-wrap"><table class="cg" id="list-table"><thead></thead><tbody></tbody></table></div>
@@ -405,24 +407,29 @@
         items.forEach(function (it) { it.addEventListener("click", function () { show(it.getAttribute("data-view")); }); });
       })();
 
-      // ---- Campaign list (Web Read A:J, read only) ----
-      var LIST_FILTER_COLS = [0, 1, 4, 5, 6, 7]; // ID, User, Type, Name, Start, End
+      // ---- Campaign list (Web Read A:J, read only) — per-column filters ----
       var listData = { headers: [], rows: [] };
       function loadCampaigns() {
         var m = el("list-msg"); m.className = "msg show info"; m.textContent = "Loading…";
         gs("getCampaigns").then(function (res) {
           listData = res || { headers: [], rows: [] };
           el("list-table").querySelector("thead").innerHTML =
-            "<tr>" + listData.headers.map(function (h) { return "<th>" + esc(h) + "</th>"; }).join("") + "</tr>";
+            "<tr>" + listData.headers.map(function (h) { return '<th class="col-head">' + esc(h) + "</th>"; }).join("") + "</tr>" +
+            '<tr class="filters">' + listData.headers.map(function (h, i) {
+              return '<th><input class="col-filter" data-col="' + i + '" type="text" placeholder="Filter" /></th>';
+            }).join("") + "</tr>";
           applyListFilter();
           m.className = "msg"; m.textContent = "";
         }).catch(function (e) { m.className = "msg show error"; m.textContent = (e && e.message) || String(e); });
       }
       function applyListFilter() {
-        var q = (el("list-filter").value || "").trim().toLowerCase();
+        var filters = [];
+        el("list-table").querySelectorAll(".col-filter").forEach(function (inp) {
+          var q = (inp.value || "").trim().toLowerCase();
+          if (q) filters.push({ col: Number(inp.getAttribute("data-col")), q: q });
+        });
         var rows = listData.rows.filter(function (r) {
-          if (!q) return true;
-          return LIST_FILTER_COLS.some(function (i) { return String(r[i] == null ? "" : r[i]).toLowerCase().indexOf(q) !== -1; });
+          return filters.every(function (f) { return String(r[f.col] == null ? "" : r[f.col]).toLowerCase().indexOf(f.q) !== -1; });
         });
         el("list-table").querySelector("tbody").innerHTML = rows.map(function (r) {
           return "<tr>" + r.map(function (c, i) {
@@ -431,8 +438,13 @@
         }).join("");
         el("list-count").textContent = rows.length + " of " + listData.rows.length + " campaigns";
       }
-      el("list-filter").addEventListener("input", applyListFilter);
+      // Delegated listener survives thead re-render.
+      el("list-table").querySelector("thead").addEventListener("input", applyListFilter);
       el("list-refresh").addEventListener("click", loadCampaigns);
+      el("list-clear").addEventListener("click", function () {
+        el("list-table").querySelectorAll(".col-filter").forEach(function (i) { i.value = ""; });
+        applyListFilter();
+      });
     </script>
   </body>
 </html>
