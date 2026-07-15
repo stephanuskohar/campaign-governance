@@ -319,6 +319,7 @@
 
       function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
       function rrow(l, val) { return '<div class="result-row"><span class="rl">' + esc(l) + '</span><span class="rv">' + esc(val) + "</span></div>"; }
+      function fmtScore(v) { var n = Number(v); return (v === "" || v == null || isNaN(n)) ? esc(v) : n.toFixed(2); }
       var IDENTITY = ["ID", "User", "Date", "Campaign Intent", "Campaign Type", "Name", "Campaign Start Date", "Campaign End Date", "# Days"];
       function renderResult(res, submitted) {
         el("result-empty").style.display = "none";
@@ -328,7 +329,7 @@
         var html = "<h2>Your Campaign</h2>";
         IDENTITY.forEach(function (k) { html += rrow(k, head[k]); });
         if (R.found) {
-          html += '<div class="result-score">Score result: <strong>' + esc(head["Score"]) + "</strong></div>";
+          html += '<div class="result-score">Score result: <strong>' + fmtScore(head["Score"]) + "</strong></div>";
           html += '<div class="result-section"><div class="result-sec-title">You are eligible to get:</div><ul class="result-list">';
           (R.basic || []).forEach(function (b) { html += "<li>" + esc(b.label) + ": <strong>" + esc(b.value) + "</strong></li>"; });
           html += "</ul></div>";
