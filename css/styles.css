@@ -560,3 +560,84 @@ textarea:focus {
     position: static;
   }
 }
+
+/* ---------------------------------------------------------------- Multi-select */
+.ms {
+  position: relative;
+}
+.ms-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+.ms.open .ms-toggle,
+.ms-toggle:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.18);
+}
+.ms-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ms-label.ms-placeholder {
+  color: var(--text-muted);
+}
+.ms-caret {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.ms.open .ms-caret {
+  transform: rotate(180deg);
+}
+.ms-panel {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 6px;
+}
+.ms-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.ms-option:hover {
+  background: var(--surface-2);
+}
+.ms-option input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--shopee-orange);
+  margin: 0;
+}
+.ms-empty {
+  padding: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 14px;
+}

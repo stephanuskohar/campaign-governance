@@ -1,5 +1,5 @@
 /**
- * Thin fetch wrapper around the Apps Script Web App JSON API.
+ * Thin fetch wrappers around the Apps Script Web App JSON API.
  *
  * IMPORTANT (CORS): Apps Script web apps cannot set arbitrary response headers,
  * so POSTs are sent as a "simple request" (Content-Type: text/plain) with a JSON
@@ -14,14 +14,7 @@ const API = (() => {
     }
   }
 
-  async function post(action, payload) {
-    ensureConfigured();
-    const res = await fetch(CONFIG.WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action, ...payload }),
-      redirect: "follow",
-    });
+  async function handle(res) {
     const text = await res.text();
     let data;
     try {
@@ -33,8 +26,29 @@ const API = (() => {
     return data.data;
   }
 
+  async function post(action, payload) {
+    ensureConfigured();
+    const res = await fetch(CONFIG.WEB_APP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action, ...payload }),
+      redirect: "follow",
+    });
+    return handle(res);
+  }
+
+  async function get(action) {
+    ensureConfigured();
+    const url = new URL(CONFIG.WEB_APP_URL);
+    url.searchParams.set("action", action);
+    const res = await fetch(url.toString(), { method: "GET", redirect: "follow" });
+    return handle(res);
+  }
+
   return {
-    /** Append a campaign; returns { id, date }. */
+    /** Load dropdown options: { intents:[...], types:[...] }. */
+    getOptions: () => get("getOptions"),
+    /** Append a campaign; returns { id, date, row }. */
     submitCampaign: (fields) => post("submitCampaign", { fields }),
   };
 })();
