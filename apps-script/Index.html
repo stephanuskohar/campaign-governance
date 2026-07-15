@@ -233,7 +233,7 @@
 
     <script>
       // ---- Config ----
-      var ALLOWED_DOMAIN = "shopee.com", MIN_DAYS = 1, MAX_DAYS = 365;
+      var ALLOWED_DOMAIN = "shopee.com", MIN_DAYS = 0, MAX_DAYS = 365;
 
       // ---- Theme ----
       (function () {
@@ -329,7 +329,7 @@
         if (!v.start) return "Choose a Campaign Start Date.";
         if (!v.end) return "Choose a Campaign End Date.";
         var d = days(v.start, v.end);
-        if (d < MIN_DAYS) return "Campaign Start Date must be before the End Date.";
+        if (d < MIN_DAYS) return "Campaign Start Date must be on or before the End Date.";
         if (d > MAX_DAYS) return "Campaign cannot be longer than " + MAX_DAYS + " days (currently " + d + ").";
         var nums = { "GMV ($)": ["f-gmv", v.gmv], "A1": ["f-a1", v.a1], "Budget ($)": ["f-budget", v.budget], "Seller Investment - Cash": ["f-cash", v.cash], "Seller Investment - Promissed PRM": ["f-prm", v.prm], "Seller Investment - Marketing Barter": ["f-barter", v.barter] };
         for (var k in nums) { if (el(nums[k][0]).value === "" || isNaN(nums[k][1])) return k + " must be a number."; if (nums[k][1] < 0) return k + " cannot be negative."; }
