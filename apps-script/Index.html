@@ -50,6 +50,8 @@
       .help::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 9px); left:50%; transform:translateX(-50%); width:230px; background:var(--text); color:var(--surface); padding:9px 11px; border-radius:6px; font-size:12px; font-weight:500; line-height:1.4; text-align:left; box-shadow:var(--shadow); opacity:0; visibility:hidden; transition:opacity .12s; z-index:70; pointer-events:none; white-space:normal; }
       .help::before { content:""; position:absolute; bottom:calc(100% + 3px); left:50%; transform:translateX(-50%); border:6px solid transparent; border-top-color:var(--text); opacity:0; visibility:hidden; transition:opacity .12s; z-index:71; }
       .help:hover::after, .help:focus::after, .help:hover::before, .help:focus::before { opacity:1; visibility:visible; }
+      .egg-toast { position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(16px); background:var(--text); color:var(--surface); padding:10px 18px; border-radius:999px; font-size:13px; font-weight:600; box-shadow:var(--shadow); opacity:0; transition:opacity .3s, transform .3s; z-index:200; pointer-events:none; }
+      .egg-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
       input, select { font-family:var(--font-body); font-size:15px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); color:var(--text); }
       input:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(238,77,45,.18); }
       input[readonly] { opacity:.85; cursor:not-allowed; }
@@ -230,6 +232,8 @@
         </section>
       </div>
     </main>
+
+    <div class="egg-toast" id="egg"></div>
 
     <script>
       // ---- Config ----
@@ -452,6 +456,27 @@
         el("list-table").querySelectorAll(".col-filter").forEach(function (i) { i.value = ""; });
         applyListFilter();
       });
+
+      // ---- Easter egg (subtle): console signature + 5 clicks on the logo ----
+      (function () {
+        try {
+          console.log("%cCampaign Governance", "color:#ee4d2d;font-weight:800;font-size:15px");
+          console.log("%ccrafted with 🧡 by Stephanus Kohar", "color:#888;font-size:12px");
+        } catch (e) {}
+        var brand = document.querySelector(".brand"), egg = document.getElementById("egg");
+        if (!brand || !egg) return;
+        var n = 0, t;
+        brand.style.cursor = "pointer";
+        brand.addEventListener("click", function () {
+          n++; clearTimeout(t); t = setTimeout(function () { n = 0; }, 1200);
+          if (n >= 5) {
+            n = 0;
+            egg.textContent = "Crafted with 🧡 by Stephanus Kohar";
+            egg.classList.add("show");
+            clearTimeout(egg._h); egg._h = setTimeout(function () { egg.classList.remove("show"); }, 2600);
+          }
+        });
+      })();
     </script>
   </body>
 </html>
