@@ -31,6 +31,25 @@ var CONFIG = {
   INTENT_COL_INDEX: 2, // column B → Campaign Intent
   TYPE_COL_INDEX: 1, // column A → Campaign Type
 
+  // --- Results read-back (READ ONLY) ---
+  READ_TAB: "Web Read",
+  READ_ID_HEADER: "ID",
+  // Basic assets: sheet header -> display label.
+  BASIC_ASSETS: [
+    { header: "Popup_Max", label: "Popup" },
+    { header: "DD_Banner_Max", label: "DD Banner" },
+    { header: "PN_Max", label: "PN" },
+    { header: "Search_Prefill_Hours", label: "Prefill Hours" },
+    { header: "Curated_Search", label: "Curated_Search" },
+  ],
+  // Identity/summary fields shown at the top, in order.
+  READ_HEADER_FIELDS: [
+    "ID", "User", "Date", "Campaign Intent", "Campaign Type", "Name",
+    "Campaign Start Date", "Campaign End Date", "# Days", "Score",
+  ],
+  // Additional assets start at the column AFTER this header (Q..AQ).
+  ADDITIONAL_AFTER_HEADER: "Curated_Search",
+
   ALLOWED_DOMAIN: "shopee.com",
 };
 // =============================================================================
@@ -109,7 +128,67 @@ function submitCampaign(fields) {
   Object.keys(cells).forEach(function (i) { row[Number(i)] = cells[i]; });
   sh.getRange(targetRow, 1, 1, maxCol).setValues([row]);
 
-  return { id: fields.ID || "", date: fields[CONFIG.DATE_HEADER], user: fields.User, row: targetRow };
+  var result = getResultById(fields.ID);
+  return { id: fields.ID || "", date: fields[CONFIG.DATE_HEADER], user: fields.User, row: targetRow, result: result };
+}
+
+// ------------------------------ Read-back (READ ONLY) ----------------------
+// Reads the "Web Read" tab, finds the row whose ID matches, and returns the
+// computed result. NEVER writes to this sheet.
+function getResultById(id) {
+  if (!id) return { found: false };
+  var sh = getSheet(CONFIG.READ_TAB);
+
+  for (var attempt = 0; attempt < 5; attempt++) {
+    SpreadsheetApp.flush(); // let Web Read formulas recompute for the new row
+    var last = sh.getLastRow();
+    if (last >= 2) {
+      var headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(function (h) { return String(h).trim(); });
+      var idIdx = headers.indexOf(CONFIG.READ_ID_HEADER);
+      if (idIdx === -1) return { found: false, error: 'ID header not found in "' + CONFIG.READ_TAB + '".' };
+      var values = sh.getRange(2, 1, last - 1, headers.length).getValues();
+      for (var r = 0; r < values.length; r++) {
+        if (String(values[r][idIdx]).trim() === String(id).trim()) {
+          return buildResult(headers, values[r]);
+        }
+      }
+    }
+    Utilities.sleep(500);
+  }
+  return { found: false };
+}
+
+function buildResult(headers, row) {
+  function at(header) {
+    var i = headers.indexOf(header);
+    return i === -1 ? "" : formatCell(header, row[i]);
+  }
+
+  var header = {};
+  CONFIG.READ_HEADER_FIELDS.forEach(function (h) { header[h] = at(h); });
+
+  var basic = CONFIG.BASIC_ASSETS.map(function (b) {
+    return { label: b.label, value: at(b.header) };
+  });
+
+  var additional = [];
+  var startAfter = headers.indexOf(CONFIG.ADDITIONAL_AFTER_HEADER);
+  if (startAfter !== -1) {
+    for (var i = startAfter + 1; i < headers.length; i++) {
+      if (!headers[i]) continue;
+      if (Number(row[i]) === 1) additional.push(headers[i]);
+    }
+  }
+
+  return { found: true, header: header, basic: basic, additional: additional };
+}
+
+function formatCell(headerName, v) {
+  if (v instanceof Date) {
+    if (headerName === CONFIG.DATE_HEADER) return Utilities.formatDate(v, CONFIG.TIMEZONE, CONFIG.DATE_FORMAT);
+    return Utilities.formatDate(v, CONFIG.TIMEZONE, "yyyy-MM-dd");
+  }
+  return v == null ? "" : v;
 }
 
 // ------------------------------- Helpers -----------------------------------

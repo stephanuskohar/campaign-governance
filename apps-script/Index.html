@@ -68,6 +68,14 @@
       .result-row .rl { color:var(--text-muted); font-weight:600; }
       .result-row .rv { color:var(--text); font-weight:700; text-align:right; word-break:break-word; }
       .result-note { margin-top:16px; padding:12px 14px; background:rgba(255,187,0,.14); border-radius:8px; color:var(--text-muted); font-size:13px; }
+      .result-score { margin:16px 0; font-size:16px; font-weight:700; color:var(--text); }
+      .result-score strong { color:var(--accent); }
+      .result-section { margin-top:14px; }
+      .result-sec-title { font-weight:700; color:var(--accent); margin-bottom:6px; }
+      .result-list { margin:0; padding-left:20px; }
+      .result-list li { padding:3px 0; font-size:14px; }
+      .result-inline-empty { color:var(--text-muted); font-style:italic; font-size:14px; }
+      .result-note-live { margin-top:12px; padding:10px 12px; background:rgba(255,187,0,.14); border-radius:8px; color:var(--text-muted); font-size:13px; }
       .ms { position:relative; }
       .ms-toggle { width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; font-family:var(--font-body); font-size:15px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); color:var(--text); cursor:pointer; text-align:left; }
       .ms.open .ms-toggle, .ms-toggle:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(238,77,45,.18); }
@@ -297,7 +305,13 @@
         };
         submitBtn.disabled = true; submitBtn.textContent = "Submitting…";
         gs("submitCampaign", fields).then(function (res) {
-          renderResult(v, intentStr, typeStr, res.id || id, res.date, days(v.start, v.end));
+          var submitted = {
+            "ID": res.id || id, "User": v.user, "Date": res.date || "",
+            "Campaign Intent": intentStr, "Campaign Type": typeStr, "Name": v.name,
+            "Campaign Start Date": v.start, "Campaign End Date": v.end,
+            "# Days": String(days(v.start, v.end))
+          };
+          renderResult(res, submitted);
           form.reset(); intentMS.clear(); el("f-user").value = v.user;
           showMsg("success", "Campaign submitted successfully (ID: " + (res.id || id) + ").");
         }).catch(function (e2) {
@@ -309,14 +323,32 @@
 
       function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
       function rrow(l, val) { return '<div class="result-row"><span class="rl">' + esc(l) + '</span><span class="rv">' + esc(val) + "</span></div>"; }
-      function renderResult(v, intentStr, typeStr, id, date, d) {
+      var IDENTITY = ["ID", "User", "Date", "Campaign Intent", "Campaign Type", "Name", "Campaign Start Date", "Campaign End Date", "# Days"];
+      function renderResult(res, submitted) {
         el("result-empty").style.display = "none";
         var rc = el("result-content"); rc.style.display = "block";
-        rc.innerHTML = "<h2>Your Campaign</h2>" +
-          rrow("ID", id) + rrow("User", v.user) + rrow("Date", date || "(recorded)") +
-          rrow("Campaign Intent", intentStr) + rrow("Campaign Type", typeStr) + rrow("Name", v.name) +
-          rrow("Campaign Start Date", v.start) + rrow("Campaign End Date", v.end) + rrow("# Days", String(d)) +
-          '<div class="result-note">Score, Tier, Duration Tier and asset eligibility (Basic &amp; Additional) will appear here once the results read-back is wired up.</div>';
+        var R = (res && res.result) || { found: false };
+        var head = R.found ? R.header : submitted;
+        var html = "<h2>Your Campaign</h2>";
+        IDENTITY.forEach(function (k) { html += rrow(k, head[k]); });
+        if (R.found) {
+          html += '<div class="result-score">Score result: <strong>' + esc(head["Score"]) + "</strong></div>";
+          html += '<div class="result-section"><div class="result-sec-title">You are eligible to get:</div><ul class="result-list">';
+          (R.basic || []).forEach(function (b) { html += "<li>" + esc(b.label) + ": <strong>" + esc(b.value) + "</strong></li>"; });
+          html += "</ul></div>";
+          html += '<div class="result-section"><div class="result-sec-title">And also these additional asset:</div>';
+          if (R.additional && R.additional.length) {
+            html += '<ul class="result-list">';
+            R.additional.forEach(function (a) { html += "<li>" + esc(a) + "</li>"; });
+            html += "</ul>";
+          } else {
+            html += '<div class="result-inline-empty">None.</div>';
+          }
+          html += "</div>";
+        } else {
+          html += '<div class="result-note-live">Submitted. Your result is still being computed — reopen the app in a moment to see the full score and eligibility.</div>';
+        }
+        rc.innerHTML = html;
       }
     </script>
   </body>
