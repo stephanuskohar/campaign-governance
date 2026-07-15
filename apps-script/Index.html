@@ -46,6 +46,10 @@
       .field.full { grid-column:1 / -1; }
       label { font-weight:600; font-size:13px; color:var(--text-muted); }
       label .req { color:var(--shopee-red); }
+      .help { position:relative; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; margin-left:6px; border-radius:50%; background:var(--accent); color:#fff; font-size:10px; font-weight:700; cursor:help; vertical-align:middle; }
+      .help::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 9px); left:50%; transform:translateX(-50%); width:230px; background:var(--text); color:var(--surface); padding:9px 11px; border-radius:6px; font-size:12px; font-weight:500; line-height:1.4; text-align:left; box-shadow:var(--shadow); opacity:0; visibility:hidden; transition:opacity .12s; z-index:70; pointer-events:none; white-space:normal; }
+      .help::before { content:""; position:absolute; bottom:calc(100% + 3px); left:50%; transform:translateX(-50%); border:6px solid transparent; border-top-color:var(--text); opacity:0; visibility:hidden; transition:opacity .12s; z-index:71; }
+      .help:hover::after, .help:focus::after, .help:hover::before, .help:focus::before { opacity:1; visibility:visible; }
       input, select { font-family:var(--font-body); font-size:15px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); color:var(--text); }
       input:focus, select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(238,77,45,.18); }
       input[readonly] { opacity:.85; cursor:not-allowed; }
@@ -177,28 +181,28 @@
                 <input id="f-end" type="date" required />
               </div>
               <div class="field">
-                <label for="f-gmv">GMV ($) <span class="req">*</span></label>
+                <label for="f-gmv">GMV ($) <span class="req">*</span><span class="help" tabindex="0" data-tip="Average daily GMV during the campaign period. If not applicable, fill with 0.">?</span></label>
                 <input id="f-gmv" type="number" min="0" step="any" required />
               </div>
               <div class="field">
-                <label for="f-a1">A1 <span class="req">*</span></label>
+                <label for="f-a1">A1 <span class="req">*</span><span class="help" tabindex="0" data-tip="Average daily A1 during the campaign period. If not applicable, fill with 0.">?</span></label>
                 <input id="f-a1" type="number" min="0" step="any" required />
               </div>
               <div class="field full">
-                <label for="f-budget">Budget ($) <span class="req">*</span></label>
+                <label for="f-budget">Budget ($) <span class="req">*</span><span class="help" tabindex="0" data-tip="Total campaign budget. If not applicable, fill with 0.">?</span></label>
                 <input id="f-budget" type="number" min="0" step="any" required />
               </div>
               <div class="field full section-label">Seller Investment ($)</div>
               <div class="field">
-                <label for="f-cash">Cash <span class="req">*</span></label>
+                <label for="f-cash">Cash <span class="req">*</span><span class="help" tabindex="0" data-tip="Seller investment in cash. If not applicable, fill with 0.">?</span></label>
                 <input id="f-cash" type="number" min="0" step="any" required />
               </div>
               <div class="field">
-                <label for="f-prm">Promissed PRM <span class="req">*</span></label>
+                <label for="f-prm">Promissed PRM <span class="req">*</span><span class="help" tabindex="0" data-tip="Seller investment via promised PRM. If not applicable, fill with 0.">?</span></label>
                 <input id="f-prm" type="number" min="0" step="any" required />
               </div>
               <div class="field full">
-                <label for="f-barter">Marketing Barter <span class="req">*</span></label>
+                <label for="f-barter">Marketing Barter <span class="req">*</span><span class="help" tabindex="0" data-tip="Seller investment via marketing barter. If not applicable, fill with 0.">?</span></label>
                 <input id="f-barter" type="number" min="0" step="any" required />
               </div>
             </div>
